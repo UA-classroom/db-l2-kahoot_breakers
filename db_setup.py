@@ -1,13 +1,21 @@
 import os
+from pathlib import Path
 
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.pool import SimpleConnectionPool
 
-load_dotenv(override=True)
+script_dir = Path(__file__).parent
+
+# Default name if none provided
+env_file_name = os.getenv("ENV_FILE", "db_info.env")
+env_path = script_dir / env_file_name
+load_dotenv(dotenv_path=env_path, override=True)
 
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 PASSWORD = os.getenv("PASSWORD")
+
+print(f"Connecting to database: {DATABASE_NAME}")
 
 # setting up connectionpool
 pool = SimpleConnectionPool(
@@ -80,7 +88,18 @@ def create_tables():
 
 
     connection = get_connection()
-
+    cur = connection.cursor()
+    try:
+        cur.execute(subscriptions)
+        cur.execute(languages)
+        cur.execute(customer_types)
+        cur.execute(organisations)
+        cur.execute(users)
+        connection.commit()
+        print("Tables created (or already existed).")
+    finally:
+        cur.close()
+        connection.close()
     
     pass
 
