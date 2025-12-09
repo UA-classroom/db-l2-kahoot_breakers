@@ -142,6 +142,100 @@ def create_tables():
     )
     """
 
+    groups = """
+        CREATE TABLE IF NOT EXISTS groups(
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50) NOT NULL,
+        description VARCHAR(200)
+        )
+        """
+
+    user_group_members = """
+    CREATE TABLE IF NOT EXISTS user_group_members(
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+	group_id INT REFERENCES groups(id) ON DELETE SET NULL,
+	UNIQUE(user_id, group_id)
+    )
+    """
+
+    groups_and_kahoots = """
+    CREATE TABLE IF NOT EXISTS groups_and_kahoots(
+    id SERIAL PRIMARY KEY,
+    group_id INT REFERENCES groups(id) ON DELETE SET NULL,
+	your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
+	UNIQUE(group_id, your_kahoot_id)
+    )
+    """
+
+    group_messages = """
+        CREATE TABLE IF NOT EXISTS group_messages(
+        id SERIAL PRIMARY KEY,
+        text VARCHAR(400) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        user_id INT REFERENCES users(id) ON DELETE SET NULL,
+        group_id INT REFERENCES groups(id) ON DELETE SET NULL
+    )
+    """
+
+    saved_payment_card = """
+        CREATE TABLE IF NOT EXISTS saved_payment_card(
+        id SERIAL PRIMARY KEY,
+        payment_provider VARCHAR(20),
+        payment_method_token VARCHAR(255),
+        card_type VARCHAR(50) CHECK (card_type IN ('Visa', 'Mastercard', 'American Express')),
+        last_four CHAR(4),
+        expiration_month INT,
+        expiration_year INT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        user_id INT REFERENCES users(id) ON DELETE SET NULL
+    )
+    """
+
+    saved_paypal = """
+        CREATE TABLE IF NOT EXISTS saved_paypal(
+        id SERIAL PRIMARY KEY,
+        payment_method_token VARCHAR(255),
+        firstname VARCHAR(100),
+        lastname VARCHAR(100),
+        payment_email VARCHAR(255),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        user_id INT REFERENCES users(id) ON DELETE SET NULL
+    )
+    """
+
+    saved_google_pay = """
+        CREATE TABLE IF NOT EXISTS saved_google_pay(
+        id SERIAL PRIMARY KEY,
+        payment_method_token VARCHAR(255),
+        firstname VARCHAR(100),
+        lastname VARCHAR(100),
+        payment_email VARCHAR(255),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        user_id INT REFERENCES users(id) ON DELETE SET NULL
+    )
+    """
+
+    transactions = """
+        CREATE TABLE IF NOT EXISTS transactions(
+        id SERIAL PRIMARY KEY,
+        payment_method_token VARCHAR(255),
+        amount DECIMAL(10,2),
+        currency CHAR(3),
+        status VARCHAR(20),
+        provider VARCHAR(20),
+        transaction_id VARCHAR(255),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        subscriptions_id INT REFERENCES subscriptions(id) ON DELETE SET NULL,
+        saved_payment_card_id INT REFERENCES saved_payment_card(id) ON DELETE SET NULL,
+        saved_paypal_id INT REFERENCES saved_paypal(id) ON DELETE SET NULL,
+        saved_google_pay_id INT REFERENCES saved_google_pay(id) ON DELETE SET NULL,
+        user_id INT REFERENCES users(id) ON DELETE SET NULL
+    )
+    """
+
+
+
 
     connection = get_connection()
     cur = connection.cursor()
