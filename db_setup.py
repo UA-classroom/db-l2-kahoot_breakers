@@ -5,12 +5,7 @@ import psycopg2
 from dotenv import load_dotenv
 from psycopg2.pool import SimpleConnectionPool
 
-script_dir = Path(__file__).parent
-
-# Default name if none provided
-env_file_name = os.getenv("ENV_FILE", ".env")
-env_path = script_dir / env_file_name
-load_dotenv(dotenv_path=env_path, override=True)
+load_dotenv()
 
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 PASSWORD = os.getenv("PASSWORD")
@@ -245,13 +240,25 @@ def create_tables():
         cur.execute(customer_types)
         cur.execute(organisations)
         cur.execute(users)
+        cur.execute(your_kahoot)
+        cur.execute(time_limits)
+        cur.execute(images)
+        cur.execute(kahoot_owners)
+        cur.execute(favorite_kahoots)
+        cur.execute(kahoot_report)
+        cur.execute(groups)
+        cur.execute(user_group_members)
+        cur.execute(groups_and_kahoots)
+        cur.execute(group_messages)
+        cur.execute(saved_payment_card)
+        cur.execute(saved_paypal)
+        cur.execute(saved_google_pay)
+        cur.execute(transactions)
         connection.commit()
         print("Tables created (or already existed).")
     finally:
         cur.close()
         connection.close()
-    
-    pass
 
 
 if __name__ == "__main__":
