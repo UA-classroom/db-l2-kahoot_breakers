@@ -1,8 +1,8 @@
 import os
-from pathlib import Path
 
 import psycopg2
 from dotenv import load_dotenv
+from psycopg2 import DatabaseError
 from psycopg2.pool import SimpleConnectionPool
 
 load_dotenv()
@@ -25,18 +25,30 @@ pool = SimpleConnectionPool(
 
 def get_connection():
     """
-    Function that returns a single connection
-    In reality, we might use a connection pool, since
-    this way we'll start a new connection each time
-    someone hits one of our endpoints, which isn't great for performance
+    Retrieve a database connection from the connection pool.
+
+    Returns:
+        A psycopg2 connection object from the pool.
     """
     return pool.getconn()
 
 
-def create_tables():
+def create_tables(con):
     """
-    A function to create the necessary tables for the project.
+    This function executes a series of SQL CREATE TABLE statements
+    to ensure that all required tables exist in the connected PostgreSQL
+    database. If a table already exists, it will not be recreated.
+
+    Args:
+        con: An active database connection object.
+
+    Raises:
+        psycopg2.IntegrityError: If any constraint violations occur while
+            creating the tables.
+        psycopg2.DatabaseError: If there is a general error when executing SQL
+            statements in the database.
     """
+    
     subscriptions = """
     CREATE TABLE IF NOT EXISTS subscriptions(
         id SERIAL PRIMARY KEY,
@@ -272,36 +284,43 @@ def create_tables():
     )
     """
 
-    connection = get_connection()
-    cur = connection.cursor()
     try:
-        cur.execute(subscriptions)
-        cur.execute(languages)
-        cur.execute(customer_types)
-        cur.execute(organisations)
-        cur.execute(users)
-        cur.execute(your_kahoot)
-        cur.execute(time_limits)
-        cur.execute(images)
-        cur.execute(kahoot_owners)
-        cur.execute(favorite_kahoots)
-        cur.execute(kahoot_report)
-        cur.execute(groups)
-        cur.execute(user_group_members)
-        cur.execute(groups_and_kahoots)
-        cur.execute(group_messages)
-        cur.execute(saved_payment_card)
-        cur.execute(saved_paypal)
-        cur.execute(saved_google_pay)
-        cur.execute(transactions)
-        connection.commit()
-        print("Tables created (or already existed).")
-    finally:
-        cur.close()
-        connection.close()
+        with con:
+            with con.cursor() as cur:
+                cur.execute(subscriptions)
+                cur.execute(languages)
+                cur.execute(customer_types)
+                cur.execute(organisations)
+                cur.execute(users)
+                cur.execute(your_kahoot)
+                cur.execute(time_limits)
+                cur.execute(images)
+                cur.execute(kahoot_owners)
+                cur.execute(favorite_kahoots)
+                cur.execute(kahoot_report)
+                cur.execute(groups)
+                cur.execute(user_group_members)
+                cur.execute(groups_and_kahoots)
+                cur.execute(group_messages)
+                cur.execute(saved_payment_card)
+                cur.execute(saved_paypal)
+                cur.execute(saved_google_pay)
+                cur.execute(transactions)
+                cur.execute(quiz_with_written_answer)
+                cur.execute(quiz_written_answer)
+                cur.execute(quiz_with_true_false)
+                cur.execute(presentation_classic)
+                cur.execute(survey_open_question)
+                print("Tables created (or already existed).")
+    except psycopg2.IntegrityError as e:
+        print(f"There has been error regarding database rules and constraints. Error message: {e}")
+    except DatabaseError as e:
+        print(f"There has been error creating tables in database. Error message: {e}")
 
 
 if __name__ == "__main__":
-    # Only reason to execute this file would be to create new tables, meaning it serves a migration file
-    create_tables()
-    print("Tables created successfully.")
+        try:
+            con = get_connection()
+            create_tables(con)
+        finally:
+            con.close()
