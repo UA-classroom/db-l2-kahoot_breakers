@@ -57,21 +57,21 @@ def create_tables():
     """
 
     customer_types = """
-        CREATE TABLE IF NOT EXISTS customer_types(
+    CREATE TABLE IF NOT EXISTS customer_types(
         id SERIAL PRIMARY KEY,
         name VARCHAR(30) NOT NULL
     )
     """
 
     organisations = """
-        CREATE TABLE IF NOT EXISTS organisations(
+    CREATE TABLE IF NOT EXISTS organisations(
         id SERIAL PRIMARY KEY,
         name VARCHAR(50) NOT NULL
     )
     """
 
     users = """
-        CREATE TABLE IF NOT EXISTS users(
+    CREATE TABLE IF NOT EXISTS users(
         id SERIAL PRIMARY KEY,
         username VARCHAR(50) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL UNIQUE,
@@ -87,7 +87,7 @@ def create_tables():
     """
 
     your_kahoot = """
-        CREATE TABLE IF NOT EXISTS your_kahoot(
+    CREATE TABLE IF NOT EXISTS your_kahoot(
         id SERIAL PRIMARY KEY,
         title VARCHAR(80) NOT NULL,
         description VARCHAR(500),
@@ -97,7 +97,7 @@ def create_tables():
     """
 
     time_limits = """
-        CREATE TABLE IF NOT EXISTS time_limits(
+    CREATE TABLE IF NOT EXISTS time_limits(
         id SERIAL PRIMARY KEY,
         length NUMERIC(5,2),
         your_kahoot_id INT UNIQUE REFERENCES your_kahoot(id) ON DELETE SET NULL
@@ -105,7 +105,7 @@ def create_tables():
     """
 
     images = """
-        CREATE TABLE IF NOT EXISTS images(
+    CREATE TABLE IF NOT EXISTS images(
         id SERIAL PRIMARY KEY,
         link VARCHAR(500),
         your_kahoot_id INT UNIQUE REFERENCES your_kahoot(id) ON DELETE SET NULL
@@ -113,7 +113,7 @@ def create_tables():
     """
 
     kahoot_owners = """
-        CREATE TABLE IF NOT EXISTS kahoot_owners(
+    CREATE TABLE IF NOT EXISTS kahoot_owners(
         id SERIAL PRIMARY KEY,
         users_id INT REFERENCES users(id) ON DELETE SET NULL,
         your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
@@ -122,7 +122,7 @@ def create_tables():
     """
 
     favorite_kahoots = """
-        CREATE TABLE IF NOT EXISTS favorite_kahoots(
+    CREATE TABLE IF NOT EXISTS favorite_kahoots(
         id SERIAL PRIMARY KEY,
         users_id INT REFERENCES users(id) ON DELETE SET NULL,
         your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
@@ -131,7 +131,7 @@ def create_tables():
     """
 
     kahoot_report = """
-        CREATE TABLE IF NOT EXISTS kahoot_report(
+    CREATE TABLE IF NOT EXISTS kahoot_report(
         id SERIAL PRIMARY KEY,
         total_questions INT NOT NULL,
         total_participants INT NOT NULL,
@@ -143,7 +143,7 @@ def create_tables():
     """
 
     groups = """
-        CREATE TABLE IF NOT EXISTS groups(
+    CREATE TABLE IF NOT EXISTS groups(
         id SERIAL PRIMARY KEY,
         name VARCHAR(50) NOT NULL,
         description VARCHAR(200)
@@ -152,24 +152,24 @@ def create_tables():
 
     user_group_members = """
     CREATE TABLE IF NOT EXISTS user_group_members(
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE SET NULL,
-	group_id INT REFERENCES groups(id) ON DELETE SET NULL,
-	UNIQUE(user_id, group_id)
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) ON DELETE SET NULL,
+        group_id INT REFERENCES groups(id) ON DELETE SET NULL,
+        UNIQUE(user_id, group_id)
     )
     """
 
     groups_and_kahoots = """
     CREATE TABLE IF NOT EXISTS groups_and_kahoots(
-    id SERIAL PRIMARY KEY,
-    group_id INT REFERENCES groups(id) ON DELETE SET NULL,
-	your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
-	UNIQUE(group_id, your_kahoot_id)
+        id SERIAL PRIMARY KEY,
+        group_id INT REFERENCES groups(id) ON DELETE SET NULL,
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
+        UNIQUE(group_id, your_kahoot_id)
     )
     """
 
     group_messages = """
-        CREATE TABLE IF NOT EXISTS group_messages(
+    CREATE TABLE IF NOT EXISTS group_messages(
         id SERIAL PRIMARY KEY,
         text VARCHAR(400) NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -179,7 +179,7 @@ def create_tables():
     """
 
     saved_payment_card = """
-        CREATE TABLE IF NOT EXISTS saved_payment_card(
+    CREATE TABLE IF NOT EXISTS saved_payment_card(
         id SERIAL PRIMARY KEY,
         payment_provider VARCHAR(20),
         payment_method_token VARCHAR(255),
@@ -193,7 +193,7 @@ def create_tables():
     """
 
     saved_paypal = """
-        CREATE TABLE IF NOT EXISTS saved_paypal(
+    CREATE TABLE IF NOT EXISTS saved_paypal(
         id SERIAL PRIMARY KEY,
         payment_method_token VARCHAR(255),
         firstname VARCHAR(100),
@@ -205,7 +205,7 @@ def create_tables():
     """
 
     saved_google_pay = """
-        CREATE TABLE IF NOT EXISTS saved_google_pay(
+    CREATE TABLE IF NOT EXISTS saved_google_pay(
         id SERIAL PRIMARY KEY,
         payment_method_token VARCHAR(255),
         firstname VARCHAR(100),
@@ -217,7 +217,7 @@ def create_tables():
     """
 
     transactions = """
-        CREATE TABLE IF NOT EXISTS transactions(
+    CREATE TABLE IF NOT EXISTS transactions(
         id SERIAL PRIMARY KEY,
         payment_method_token VARCHAR(255),
         amount DECIMAL(10,2),
@@ -234,8 +234,48 @@ def create_tables():
     )
     """
 
+    quiz_with_written_answer = """
+    CREATE TABLE IF NOT EXISTS quiz_with_written_answer(
+        id SERIAL PRIMARY KEY,
+        question VARCHAR(100) NOT NULL,
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
 
+    quiz_written_answer = """
+    CREATE TABLE IF NOT EXISTS quiz_written_answer(
+        id SERIAL PRIMARY KEY,
+        answer VARCHAR(100) NOT NULL,
+        quiz_with_written_answer_id INT REFERENCES quiz_with_written_answer(id) ON DELETE SET NULL
+    )
+    """
 
+    quiz_with_true_false = """
+    CREATE TABLE IF NOT EXISTS quiz_with_true_false(
+        id SERIAL PRIMARY KEY,
+        question VARCHAR(100) NOT NULL,
+        answer BOOLEAN NOT NULL,
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
+
+    presentation_classic = """
+    CREATE TABLE IF NOT EXISTS presentation_classic(
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(100),
+        text VARCHAR(500),
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
+
+    survey_open_question = """
+    CREATE TABLE IF NOT EXISTS survey_open_question(
+        id SERIAL PRIMARY KEY,
+        question VARCHAR(100),
+        answer_text VARCHAR(250),
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
 
     connection = get_connection()
     cur = connection.cursor()
