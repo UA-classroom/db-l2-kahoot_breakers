@@ -8,7 +8,7 @@ from psycopg2.pool import SimpleConnectionPool
 script_dir = Path(__file__).parent
 
 # Default name if none provided
-env_file_name = os.getenv("ENV_FILE", "db_info.env")
+env_file_name = os.getenv("ENV_FILE", ".env")
 env_path = script_dir / env_file_name
 load_dotenv(dotenv_path=env_path, override=True)
 
@@ -83,6 +83,62 @@ def create_tables():
         language_id INT NOT NULL REFERENCES languages(id) ON DELETE RESTRICT,
         customer_type_id INT NOT NULL REFERENCES customer_types(id) ON DELETE RESTRICT,
         organisation_id INT REFERENCES organisations(id) ON DELETE SET NULL
+    )
+    """
+
+    your_kahoot = """
+        CREATE TABLE IF NOT EXISTS your_kahoot(
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(80) NOT NULL,
+        description VARCHAR(500),
+        is_private BOOLEAN,
+        language_id INT NOT NULL REFERENCES languages(id) ON DELETE RESTRICT
+    )
+    """
+
+    time_limits = """
+        CREATE TABLE IF NOT EXISTS time_limits(
+        id SERIAL PRIMARY KEY,
+        length NUMERIC(5,2),
+        your_kahoot_id INT UNIQUE REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
+
+    images = """
+        CREATE TABLE IF NOT EXISTS images(
+        id SERIAL PRIMARY KEY,
+        link VARCHAR(500),
+        your_kahoot_id INT UNIQUE REFERENCES your_kahoot(id) ON DELETE SET NULL
+    )
+    """
+
+    kahoot_owners = """
+        CREATE TABLE IF NOT EXISTS kahoot_owners(
+        id SERIAL PRIMARY KEY,
+        users_id INT REFERENCES users(id) ON DELETE SET NULL,
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
+        UNIQUE(users_id, your_kahoot_id)
+    )
+    """
+
+    favorite_kahoots = """
+        CREATE TABLE IF NOT EXISTS favorite_kahoots(
+        id SERIAL PRIMARY KEY,
+        users_id INT REFERENCES users(id) ON DELETE SET NULL,
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL,
+        UNIQUE(users_id, your_kahoot_id)
+    )
+    """
+
+    kahoot_report = """
+        CREATE TABLE IF NOT EXISTS kahoot_report(
+        id SERIAL PRIMARY KEY,
+        total_questions INT NOT NULL,
+        total_participants INT NOT NULL,
+        correct_answers INT,
+        duration INTERVAL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        your_kahoot_id INT REFERENCES your_kahoot(id) ON DELETE SET NULL
     )
     """
 
