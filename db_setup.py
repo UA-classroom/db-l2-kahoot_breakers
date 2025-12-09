@@ -2,12 +2,23 @@ import os
 
 import psycopg2
 from dotenv import load_dotenv
+from psycopg2.pool import SimpleConnectionPool
 
 load_dotenv(override=True)
 
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 PASSWORD = os.getenv("PASSWORD")
 
+# setting up connectionpool
+pool = SimpleConnectionPool(
+    minconn=1,
+    maxconn=12,
+    dbname=DATABASE_NAME,
+    user="postgres",
+    password=PASSWORD,
+    host="localhost",
+    port="5432",
+)
 
 def get_connection():
     """
@@ -16,13 +27,7 @@ def get_connection():
     this way we'll start a new connection each time
     someone hits one of our endpoints, which isn't great for performance
     """
-    return psycopg2.connect(
-        dbname=DATABASE_NAME,
-        user="postgres",  # change if needed
-        password=PASSWORD,
-        host="localhost",  # change if needed
-        port="5432",  # change if needed
-    )
+    return pool.getconn()
 
 
 def create_tables():
