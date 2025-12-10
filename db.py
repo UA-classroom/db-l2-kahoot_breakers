@@ -1,4 +1,7 @@
 import psycopg2
+from db_setup import get_connection
+from fastapi import HTTPException
+from psycopg2 import DatabaseError
 from psycopg2.extras import RealDictCursor
 
 """
@@ -16,6 +19,80 @@ start with a connection parameter.
 - Below, a few inspirational functions exist - feel free to completely ignore how they are structured
 - E.g, if you decide to use psycopg3, you'd be able to directly use pydantic models with the cursor, these examples are however using psycopg2 and RealDictCursor
 """
+
+con = get_connection()
+
+def create_subscriptions(con, name):
+    query = """
+    INSERT INTO subscriptions (name)
+    VALUES (%s)
+    RETURNING name;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (name,))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to insert the subscription name. Error message: {e}")
+
+def create_languages(con, name):
+    query = """
+    INSERT INTO languages (name)
+    VALUES (%s)
+    RETURNING name;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (name,))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to insert the language name. Error message: {e}")
+
+def create_customer_types(con, name):
+    query = """
+    INSERT INTO customer_types (name)
+    VALUES (%s)
+    RETURNING name;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (name,))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to insert the customer type name. Error message: {e}")
+
+def create_users(con, username, email, password, birthdate, subscriptions_id, language_id, customer_type_id, name=None, organisation=None):
+    query = """
+    INSERT INTO users (username, email, password, birthdate, subscriptions_id, language_id, customer_type_id, name, organisation) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    RETURNING id, username, email;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (username, email, password, birthdate, subscriptions_id, language_id, customer_type_id, name, organisation,))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to insert the user. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to insert the user. Error message: {e}")
+
+
+
+
+
+
+
+
+
+print(create_users(con, "HassanM", "aa@dd.se", "hemligt", "1990-01-07", 1, 1, 1, "hassan mehdi", "SEB banken"))
 
 
 ### THIS IS JUST AN EXAMPLE OF A FUNCTION FOR INSPIRATION FOR A LIST-OPERATION (FETCHING MANY ENTRIES)
