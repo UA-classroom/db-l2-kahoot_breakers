@@ -152,7 +152,7 @@ def create_groups(con, name, description=None):
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the group. Error message: {e}")
 
-def user_group_members(con, user_id, group_id):
+def create_user_group_members(con, user_id, group_id):
     query = """
     INSERT INTO user_group_members (user_id, group_id) 
     VALUES (%s, %s)
@@ -169,12 +169,88 @@ def user_group_members(con, user_id, group_id):
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the group membership. Error message: {e}")
 
+def create_written_quiz(con, question, your_kahoot_id):
+    query = """
+    INSERT INTO quiz_with_written_answer (question, your_kahoot_id) 
+    VALUES (%s, %s)
+    RETURNING *;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (question, your_kahoot_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
+
+def create_answer_quiz(con, answer, quiz_with_written_answer_id):
+    query = """
+    INSERT INTO quiz_written_answer (answer, quiz_with_written_answer_id) 
+    VALUES (%s, %s)
+    RETURNING *;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (answer, quiz_with_written_answer_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz answer. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz answer. Error message: {e}")
+
+def create_true_false_quiz(con, question, answer, your_kahoot_id):
+    query = """
+    INSERT INTO quiz_with_true_false (question, answer, your_kahoot_id)
+    VALUES (%s, %s, %s)
+    RETURNING *;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (question, answer, your_kahoot_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
+
+def create_presentation_classic(con, your_kahoot_id, title=None, text=None):
+    query = """
+    INSERT INTO presentation_classic (title, text, your_kahoot_id)
+    VALUES (%s, %s, %s)
+    RETURNING *;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (title, text, your_kahoot_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the presenation. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the presentation. Error message: {e}")
 
 
 
 
 
-print(user_group_members(con, 1, 1))
+
+
+
+
+
+
+
+
+
+print(create_presentation_classic(con, 1, "jaaaaaa", "mkt mkt mk text"))
 
 
 
