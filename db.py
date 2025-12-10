@@ -308,6 +308,84 @@ def read_users_joined_kahoot(con):
     except DatabaseError as e:
         raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
+def read_users_favorite_kahoot(con):
+    # We have users table that is on the left side, and want to join it to favorite_kahoot,
+    # to see all the favorite kahoots a user have. The problem is that favorite_kahoot only stores the relationship
+    # and not other data, therefore we still need to tripple join it with your_kahoot where data is stored.
+    # We use alias for id because both table have the same name for id.
+    # We use order by because otherwise the order will be different every time the function is called.
+    query = """
+    SELECT 
+        users.id AS user_id,
+        users.username,
+        users.name,
+        users.email,
+        users.organisation,
+        your_kahoot.id AS kahoot_id,
+        your_kahoot.title,
+        your_kahoot.description,
+        your_kahoot.is_private
+    FROM users
+    LEFT JOIN favorite_kahoots
+        ON users.id = favorite_kahoots.users_id
+    LEFT JOIN your_kahoot
+        ON favorite_kahoots.your_kahoot_id = your_kahoot.id
+    ORDER BY users.id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
+
+def read_users_groups(con):
+    # We have our users table that is on the left side, and want to join it to the groups table,
+    # to see which group a user belongs to. The problem is in the groups table there is no foreign key stored,
+    # thats why we need to tripple join it with the intermediate table where the relationship is stored.
+    query = """
+    SELECT 
+        users.id AS user_id,
+        users.username,
+        users.name,
+        users.birthdate,
+        users.email,
+        groups.id AS group_id,
+        groups.name AS group_name,
+        groups.description AS group_description
+    FROM users
+    LEFT JOIN user_group_members
+        ON users.id = user_group_members.user_id
+    LEFT JOIN groups
+        ON user_group_members.group_id = groups.id
+    ORDER BY users.id ASC;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
+
+def read_individual_user(con, primary_key_id):
+    query = """
+    SELECT id, username, email, birthdate, signup_date, name, organisation FROM users WHERE id = %s;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (primary_key_id,))
+                result = cur.fetchone()
+                # error handling if no user is found with provided primary key
+                if result is None:
+                    raise HTTPException(status_code=400, detail="No user found with provided primary key id.")
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
 
 
@@ -318,17 +396,11 @@ def read_users_joined_kahoot(con):
 
 
 
-
-
-print(read_users_joined_kahoot(con))
-
+print(read_individual_user(con, 3))
 
 
 
 
-
-
-#print(create_users(con, "HassanM", "aa@dd.se", "hemligt", "1990-01-07", 1, 1, 1, "hassan mehdi", "SEB banken"))
 
 
 ### THIS IS JUST AN EXAMPLE OF A FUNCTION FOR INSPIRATION FOR A LIST-OPERATION (FETCHING MANY ENTRIES)
