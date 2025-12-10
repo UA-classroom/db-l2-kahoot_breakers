@@ -84,6 +84,97 @@ def create_users(con, username, email, password, birthdate, subscriptions_id, la
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to insert the user. Error message: {e}")
 
+def create_your_kahoot(con, title, language_id, description=None, is_private=False):
+    query = """
+    INSERT INTO your_kahoot (title, language_id, description, is_private) 
+    VALUES (%s, %s, %s, %s)
+    RETURNING id, title;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (title, language_id, description, is_private))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the kahoot. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the kahoot. Error message: {e}")
+
+def create_kahoot_owners(con, users_id, your_kahoot_id):
+    query = """
+    INSERT INTO kahoot_owners (users_id, your_kahoot_id) 
+    VALUES (%s, %s)
+    RETURNING id, users_id, your_kahoot_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (users_id, your_kahoot_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the kahoot ownership. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the kahoot ownership. Error message: {e}")
+
+def create_favorite_kahoots(con, users_id, your_kahoot_id):
+    query = """
+    INSERT INTO favorite_kahoots (users_id, your_kahoot_id) 
+    VALUES (%s, %s)
+    RETURNING id, users_id, your_kahoot_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (users_id, your_kahoot_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
+
+def create_groups(con, name, description=None):
+    query = """
+    INSERT INTO groups (name, description) 
+    VALUES (%s, %s)
+    RETURNING id, name;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (name, description))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group. Error message: {e}")
+
+def user_group_members(con, user_id, group_id):
+    query = """
+    INSERT INTO user_group_members (user_id, group_id) 
+    VALUES (%s, %s)
+    RETURNING id, user_id, group_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (user_id, group_id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group membership. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group membership. Error message: {e}")
+
+
+
+
+
+
+print(user_group_members(con, 1, 1))
 
 
 
@@ -91,8 +182,7 @@ def create_users(con, username, email, password, birthdate, subscriptions_id, la
 
 
 
-
-print(create_users(con, "HassanM", "aa@dd.se", "hemligt", "1990-01-07", 1, 1, 1, "hassan mehdi", "SEB banken"))
+#print(create_users(con, "HassanM", "aa@dd.se", "hemligt", "1990-01-07", 1, 1, 1, "hassan mehdi", "SEB banken"))
 
 
 ### THIS IS JUST AN EXAMPLE OF A FUNCTION FOR INSPIRATION FOR A LIST-OPERATION (FETCHING MANY ENTRIES)
