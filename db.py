@@ -237,6 +237,76 @@ def create_presentation_classic(con, your_kahoot_id, title=None, text=None):
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the presentation. Error message: {e}")
 
+def read_all_users(con):
+    query = """
+    SELECT * FROM users;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
+
+def read_all_kahoots(con):
+    query = """
+    SELECT * FROM your_kahoot;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the kahoots. Error message: {e}")
+
+def read_all_groups(con):
+    query = """
+    SELECT * FROM groups;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the groups. Error message: {e}")
+
+def read_users_joined_kahoot(con):
+    # This query is complicated but necessary.
+    # I have my users table that is on the left side, and want to join it to the your_kahoot table,
+    # to see all the kahoots a user have. The problem is in your_kahoot table there is no foreign key stored
+    # for the users, beacuse there is an intermediate table that store the relationship.
+    # Therefore to reach your_kahoot we need to left join 3 tables.
+    # And lastly user.id and your_kahoot.id is renamed with alias because both tables use id as a primary key name.
+    query = """
+    SELECT 
+        users.id AS user_id,
+        users.username,
+        users.email,
+        your_kahoot.id AS kahoot_id,
+        your_kahoot.title,
+        your_kahoot.description,
+        your_kahoot.is_private
+    FROM users
+    LEFT JOIN kahoot_owners
+        ON users.id = kahoot_owners.users_id
+    LEFT JOIN your_kahoot
+        ON kahoot_owners.your_kahoot_id = your_kahoot.id
+    ORDER BY users.id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                result = cur.fetchall()
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
 
 
@@ -250,7 +320,7 @@ def create_presentation_classic(con, your_kahoot_id, title=None, text=None):
 
 
 
-print(create_presentation_classic(con, 1, "jaaaaaa", "mkt mkt mk text"))
+print(read_users_joined_kahoot(con))
 
 
 
