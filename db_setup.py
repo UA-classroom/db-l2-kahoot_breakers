@@ -70,13 +70,6 @@ def create_tables(con):
     )
     """
 
-    organisations = """
-    CREATE TABLE IF NOT EXISTS organisations(
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(50) NOT NULL
-    )
-    """
-
     users = """
     CREATE TABLE IF NOT EXISTS users(
         id SERIAL PRIMARY KEY,
@@ -86,10 +79,10 @@ def create_tables(con):
         birthdate DATE NOT NULL,
         signup_date TIMESTAMP NOT NULL DEFAULT NOW(),
         name VARCHAR(255),
+        organisation VARCHAR(50),
         subscriptions_id INT NOT NULL REFERENCES subscriptions(id) ON DELETE RESTRICT,
         language_id INT NOT NULL REFERENCES languages(id) ON DELETE RESTRICT,
-        customer_type_id INT NOT NULL REFERENCES customer_types(id) ON DELETE RESTRICT,
-        organisation_id INT REFERENCES organisations(id) ON DELETE SET NULL
+        customer_type_id INT NOT NULL REFERENCES customer_types(id) ON DELETE RESTRICT
     )
     """
 
@@ -100,14 +93,6 @@ def create_tables(con):
         description VARCHAR(500),
         is_private BOOLEAN,
         language_id INT NOT NULL REFERENCES languages(id) ON DELETE RESTRICT
-    )
-    """
-
-    time_limits = """
-    CREATE TABLE IF NOT EXISTS time_limits(
-        id SERIAL PRIMARY KEY,
-        length NUMERIC(5,2),
-        your_kahoot_id INT UNIQUE REFERENCES your_kahoot(id) ON DELETE SET NULL
     )
     """
 
@@ -290,10 +275,8 @@ def create_tables(con):
                 cur.execute(subscriptions)
                 cur.execute(languages)
                 cur.execute(customer_types)
-                cur.execute(organisations)
                 cur.execute(users)
                 cur.execute(your_kahoot)
-                cur.execute(time_limits)
                 cur.execute(images)
                 cur.execute(kahoot_owners)
                 cur.execute(favorite_kahoots)
