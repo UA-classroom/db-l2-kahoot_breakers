@@ -17,6 +17,12 @@ from db import (
     create_users,
     create_written_quiz,
     create_your_kahoot,
+    delete_quiz_answer_with_written_answer,
+    delete_quiz_question_with_written_answer,
+    delete_quiz_with_true_false,
+    delete_user_by_username,
+    delete_your_kahoot_by_id,
+    patch_question_quiz_with_true_false,
     read_all_groups,
     read_all_kahoots,
     read_all_users,
@@ -24,6 +30,12 @@ from db import (
     read_users_favorite_kahoot,
     read_users_groups,
     read_users_joined_kahoot,
+    update_groups,
+    update_presentation_classic,
+    update_quiz_answer_with_written_answer,
+    update_quiz_question_with_written_answer,
+    update_quiz_with_true_false,
+    update_your_kahoot_by,
 )
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException

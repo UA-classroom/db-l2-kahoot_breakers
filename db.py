@@ -22,7 +22,7 @@ start with a connection parameter.
 - E.g, if you decide to use psycopg3, you'd be able to directly use pydantic models with the cursor, these examples are however using psycopg2 and RealDictCursor
 """
 
-con = get_connection()
+# con = get_connection()  # Don't create connection at module level
 
 def create_subscriptions(con, name):
     query = """
@@ -578,14 +578,13 @@ def delete_user_by_username(con, username):
     try:
         with con:
             with con.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(query, (username))
+                cur.execute(query, (username,))
                 result = cur.fetchone()
                 if result is None:
                     raise HTTPException(status_code=404, detail="User not found, no deletion could be made")
                 return result
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to delete the user. Error message: {e}")
-    # FIXME should this have a confirmation message, i.e user blba bla deleted?
 
 def delete_your_kahoot_by_id(con, your_kahoot_id):
     query = """
@@ -603,7 +602,6 @@ def delete_your_kahoot_by_id(con, your_kahoot_id):
                 return result
     except psycopg2.errors.ForeignKeyViolation as e:
         raise HTTPException(status_code=400, detail=f"Unable to delete the Kahoot with that id. Error message: {e}")
-    # FIXME should this have a confirmation message, i.e blba bla deleted?
 
 def delete_quiz_question_with_written_answer(con, quiz_with_written_answer_id):
     query = """
@@ -773,7 +771,7 @@ def update_presentation_classic(con, id, your_kahoot_id, title=None, text=None):
 
 def patch_question_quiz_with_true_false(con, id, question):
     query = """
-    UPDATE quiz_with_true_false 
+    UPDATE quiz_with_true_false
     SET question = %s
     WHERE id = %s
     RETURNING id, question, answer, your_kahoot_id;
@@ -788,9 +786,9 @@ def patch_question_quiz_with_true_false(con, id, question):
                 return result
     except DatabaseError as e:
         raise HTTPException(status_code=400, detail=f"Database error while updating quiz. Error message: {e}")
-    
-clear_tables(con)
-test_inputs()
+
+# clear_tables(con)
+# test_inputs()
 
 # # Example calls for delete functions
 #=====================================================
