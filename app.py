@@ -4,13 +4,18 @@ from typing import Optional
 
 import psycopg2
 from db import (
+    create_answer_quiz,
     create_customer_types,
     create_favorite_kahoots,
     create_groups,
     create_kahoot_owners,
     create_languages,
+    create_presentation_classic,
     create_subscriptions,
+    create_true_false_quiz,
+    create_user_group_members,
     create_users,
+    create_written_quiz,
     create_your_kahoot,
 )
 from db_setup import get_connection
@@ -61,6 +66,23 @@ class FavoriteKahootCreate(BaseModel):
 class GroupCreate(BaseModel):
     name: str
     description: str | None = None
+class GroupMembershipCreate(BaseModel):
+    user_id: int
+    group_id: int
+class WrittenQuizCreate(BaseModel):
+    question: str
+    your_kahoot_id: int
+class QuizAnswerCreate(BaseModel):
+    answer: str
+    quiz_with_written_answer_id: int
+class TrueFalseQuizCreate(BaseModel):
+    question: str
+    answer: bool
+    your_kahoot_id: int
+class PresentationClassicCreate(BaseModel):
+    your_kahoot_id: int
+    title: Optional[str] = None
+    text: Optional[str] = None
 
     
 
@@ -175,6 +197,84 @@ def create_groups_endpoint(group: GroupCreate):
         pass
     finally:
         connection.close()
+
+@app.post("/group_membership")
+def create_group_membership_endpoint(membership: GroupMembershipCreate):
+    connection = get_connection()
+    try:
+        out_data = create_user_group_members(connection,
+                                user_id=membership.user_id,
+                                group_id=membership.group_id
+        )
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.post("/written_quiz")
+def create_written_quiz_endpoint(quiz: WrittenQuizCreate):
+    connection = get_connection()
+    try:
+        out_data = create_written_quiz(connection,
+                                    question=quiz.question,
+                                    your_kahoot_id=quiz.your_kahoot_id
+        )
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.post("/quiz_answer")
+def create_answer_quiz_endpoint(quiz_answer: QuizAnswerCreate):
+    connection = get_connection()
+    try:
+        out_data = create_answer_quiz(connection,
+                                    answer=quiz_answer.answer,
+                                    quiz_with_written_answer_id=quiz_answer.quiz_with_written_answer_id
+        )
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.post("/true_false_quiz")
+def create_true_false_quiz_endpoint(quiz: TrueFalseQuizCreate):
+    connection = get_connection()
+    try:
+        out_data = create_true_false_quiz(connection,
+                                        question=quiz.question,
+                                        answer=quiz.answer,
+                                        your_kahoot_id=quiz.your_kahoot_id
+        )
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.post("/classic_presenation")
+def create_classic_presenation_endpoint(presentation: PresentationClassicCreate):
+    connection = get_connection()
+    try:
+        out_data = create_presentation_classic(connection,
+                                            your_kahoot_id=presentation.your_kahoot_id,
+                                            title=presentation.title,
+                                            text=presentation.text
+        )
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+
+
+
+
+
 
 
 
