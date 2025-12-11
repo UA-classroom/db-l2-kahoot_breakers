@@ -1,8 +1,10 @@
 import os
 
 import psycopg2
+from db import create_subscriptions
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -17,6 +19,23 @@ Read more: https://www.geeksforgeeks.org/10-most-common-http-status-codes/
 - Use correct URL paths the resource, e.g some endpoints should be located at the exact same URL, 
 but will have different HTTP-verbs.
 """
+
+class SubscriptionCreate(BaseModel):
+    name: str
+
+@app.post("/subscriptions")
+def create_subscription_endpoint(subscription: SubscriptionCreate):
+    connection = get_connection()
+
+    try:
+        out_data = create_subscriptions(connection, subscription.name)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+    
 
 
 # INSPIRATION FOR A LIST-ENDPOINT - Not necessary to use pydantic models, but we could to ascertain that we return the correct values
