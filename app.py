@@ -544,13 +544,7 @@ def put_quiz_true_false(id: int, quiz: QuizTrueFalseUpdate):
     con = get_connection()
 
     try:
-        result = update_quiz_with_true_false(
-            con,
-            id=id,
-            question=quiz.question,
-            answer=quiz.answer,
-            your_kahoot_id=quiz.your_kahoot_id,
-        )
+        result = update_quiz_with_true_false(con, id=id, question=quiz.question, answer=quiz.answer,your_kahoot_id=quiz.your_kahoot_id,)
         return {
             "message": f"Quiz true/false id '{id}' updated successfully",
             "updated_quiz": result,
@@ -566,12 +560,7 @@ def put_quiz_true_false(id: int, quiz: QuizTrueFalseUpdate):
 def put_quiz_answer_with_written_answer(id: int, body: QuizAnswerWrittenUpdate):
     con = get_connection()
     try:
-        result = update_quiz_answer_with_written_answer(
-            con,
-            id=id,
-            quiz_with_written_answer_id=body.quiz_with_written_answer_id,
-            answer=body.answer,
-        )
+        result = update_quiz_answer_with_written_answer(con, id=id, quiz_with_written_answer_id=body.quiz_with_written_answer_id,answer=body.answer,)
         return {
             "message": f"Quiz written answer id '{id}' updated successfully",
             "updated_answer": result,
@@ -587,12 +576,7 @@ def put_quiz_answer_with_written_answer(id: int, body: QuizAnswerWrittenUpdate):
 def put_quiz_question_with_written_answer(id: int, body: QuizQuestionWrittenUpdate):
     con = get_connection()
     try:
-        result = update_quiz_question_with_written_answer(
-            con,
-            id=id,
-            question=body.question,
-            your_kahoot_id=body.your_kahoot_id,
-        )
+        result = update_quiz_question_with_written_answer(con, id=id, question=body.question, your_kahoot_id=body.your_kahoot_id,)
         return {
             "message": f"Quiz question with written answer id '{id}' updated successfully",
             "updated_question": result,
@@ -608,14 +592,7 @@ def put_quiz_question_with_written_answer(id: int, body: QuizQuestionWrittenUpda
 def put_your_kahoot(your_kahoot_id: int, body: YourKahootUpdate):
     con = get_connection()
     try:
-        result = update_your_kahoot_by(
-            con,
-            your_kahoot_id=your_kahoot_id,
-            title=body.title,
-            description=body.description,
-            is_private=body.is_private,
-            language_id=body.language_id,
-        )
+        result = update_your_kahoot_by(con, your_kahoot_id=your_kahoot_id, title=body.title, description=body.description, is_private=body.is_private, language_id=body.language_id,)
         return {
             "message": f"Kahoot id '{your_kahoot_id}' updated successfully",
             "updated_kahoot": result,
@@ -631,12 +608,7 @@ def put_your_kahoot(your_kahoot_id: int, body: YourKahootUpdate):
 def put_group(id: int, body: GroupUpdate):
     con = get_connection()
     try:
-        result = update_groups(
-            con,
-            id=id,
-            name=body.name,
-            description=body.description,
-        )
+        result = update_groups(con, id=id, name=body.name, description=body.description,)
         return {
             "message": f"Group id '{id}' updated successfully",
             "updated_group": result,
@@ -652,13 +624,7 @@ def put_group(id: int, body: GroupUpdate):
 def put_presentation_classic(id: int, body: PresentationClassicUpdate):
     con = get_connection()
     try:
-        result = update_presentation_classic(
-            con,
-            id=id,
-            your_kahoot_id=body.your_kahoot_id,
-            title=body.title,
-            text=body.text,
-        )
+        result = update_presentation_classic(con, id=id,your_kahoot_id=body.your_kahoot_id,title=body.title,text=body.text,)
         return {
             "message": f"Presentation classic id '{id}' updated successfully",
             "updated_presentation": result,
@@ -676,11 +642,7 @@ def put_presentation_classic(id: int, body: PresentationClassicUpdate):
 def patch_quiz_true_false_question(id: int, body: QuizTrueFalseQuestionPatch):
     con = get_connection()
     try:
-        result = patch_question_quiz_with_true_false(
-            con,
-            id=id,
-            question=body.question,
-        )
+        result = patch_question_quiz_with_true_false(con, id=id, question=body.question,)
         return {
             "message": f"Quiz true/false id '{id}' question updated successfully",
             "updated_quiz": result,
