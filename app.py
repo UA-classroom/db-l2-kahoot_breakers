@@ -462,7 +462,7 @@ def delete_user_endpoint(username: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
     finally:
         connection.close()
 
@@ -482,7 +482,7 @@ def delete_your_kahoot_endpoint(your_kahoot_id: int):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
     finally:
         connection.close()
 
@@ -499,7 +499,7 @@ def delete_quiz_question_with_written_answer_endpoint(quiz_with_written_answer_i
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
     finally:
         connection.close()
 
@@ -516,7 +516,7 @@ def delete_quiz_answer_with_written_answer_endpoint(quiz_written_answer_id: int)
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
     finally:
         connection.close()
 
@@ -533,7 +533,7 @@ def delete_quiz_with_true_false_endpoint(quiz_with_true_false_id: int):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
     finally:
         connection.close()
 
@@ -552,7 +552,7 @@ def put_quiz_true_false(id: int, quiz: QuizTrueFalseUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -568,7 +568,7 @@ def put_quiz_answer_with_written_answer(id: int, body: QuizAnswerWrittenUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -584,7 +584,7 @@ def put_quiz_question_with_written_answer(id: int, body: QuizQuestionWrittenUpda
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -600,7 +600,7 @@ def put_your_kahoot(your_kahoot_id: int, body: YourKahootUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -616,7 +616,7 @@ def put_group(id: int, body: GroupUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -632,7 +632,7 @@ def put_presentation_classic(id: int, body: PresentationClassicUpdate):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
@@ -650,7 +650,7 @@ def patch_quiz_true_false_question(id: int, body: QuizTrueFalseQuestionPatch):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
 
