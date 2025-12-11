@@ -234,7 +234,7 @@ def create_true_false_quiz_endpoint(quiz: s.TrueFalseQuizCreate):
     finally:
         connection.close()
 
-@app.post("/classic_presenation")
+@app.post("/classic_presentation")
 def create_classic_presenation_endpoint(presentation: s.PresentationClassicCreate):
     connection = get_connection()
     try:

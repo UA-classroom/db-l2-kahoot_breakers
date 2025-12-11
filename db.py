@@ -3,11 +3,6 @@ from fastapi import HTTPException
 from psycopg2 import DatabaseError
 from psycopg2.extras import RealDictCursor
 
-# FIXME ska nedan tas bort också?
-from db_setup import (
-    get_connection,
-)
-
 
 def create_subscriptions(con, name):
     query = """
