@@ -5,3 +5,5 @@ venv
 description*
 __pycache__/
 *.pyc
+.vscode/
+.pytest_cache/
