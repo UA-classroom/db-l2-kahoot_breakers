@@ -17,6 +17,13 @@ from db import (
     create_users,
     create_written_quiz,
     create_your_kahoot,
+    read_all_groups,
+    read_all_kahoots,
+    read_all_users,
+    read_individual_user,
+    read_users_favorite_kahoot,
+    read_users_groups,
+    read_users_joined_kahoot,
 )
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException
@@ -83,6 +90,7 @@ class PresentationClassicCreate(BaseModel):
     your_kahoot_id: int
     title: Optional[str] = None
     text: Optional[str] = None
+
 
     
 
@@ -270,6 +278,82 @@ def create_classic_presenation_endpoint(presentation: PresentationClassicCreate)
     finally:
         connection.close()
 
+@app.get("/all_users")
+def read_all_users_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_all_users(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/all_kahoots")
+def read_all_kahoots_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_all_kahoots(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/all_groups")
+def read_all_groups_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_all_groups(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/users_kahoot")
+def read_users_kahoot_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_users_joined_kahoot(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/users_favorite")
+def read_users_favorite_kahoot_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_users_favorite_kahoot(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/users_group")
+def read_users_groups_endpoint():
+    connection = get_connection()
+    try:
+        out_data = read_users_groups(connection)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
+
+@app.get("/user/{user_id}")
+def read_individual_user_endpoint(user_id: int):
+    connection = get_connection()
+    try:
+        out_data = read_individual_user(connection, user_id)
+        return out_data
+    except:
+        pass
+    finally:
+        connection.close()
 
 
 
@@ -278,12 +362,6 @@ def create_classic_presenation_endpoint(presentation: PresentationClassicCreate)
 
 
 
-
-
-
-
-
-#~/desktop/project/db-l2-kahoot_breakers 
 
 # INSPIRATION FOR A LIST-ENDPOINT - Not necessary to use pydantic models, but we could to ascertain that we return the correct values
 # @app.get("/items/")
