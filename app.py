@@ -520,7 +520,7 @@ def delete_quiz_answer_with_written_answer_endpoint(quiz_written_answer_id: int)
     finally:
         connection.close()
 
-@app.delete("/delete_quiz_with_true_false/{quiz_with_true_false_id}")
+@app.delete("/quiz_true_false/{quiz_with_true_false_id}")
 def delete_quiz_with_true_false_endpoint(quiz_with_true_false_id: int):
     connection = get_connection()
 
