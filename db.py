@@ -1,11 +1,10 @@
 import psycopg2
-from fastapi import HTTPException
-from psycopg2 import DatabaseError
-from psycopg2.extras import RealDictCursor
-
 from db_setup import (
     get_connection,  # TODO REMOVE THIS BEFORE SENDING IN, for testing in this file
 )
+from fastapi import HTTPException
+from psycopg2 import DatabaseError
+from psycopg2.extras import RealDictCursor
 
 """
 This file is responsible for making database queries, which your fastapi endpoints/routes can use.
