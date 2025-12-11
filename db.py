@@ -662,18 +662,160 @@ def delete_quiz_with_true_false(con, quiz_with_true_false_id):
         raise HTTPException(status_code=400, detail=f"Unable to delete the Quiz answer with that id. Error message: {e}")
     # FIXME should this have a confirmation message, i.e blba bla deleted?
 
-# clear_tables(con)
-# test_inputs()
+def update_quiz_with_true_false(con, id, question, answer, your_kahoot_id):
+    query = """
+    UPDATE quiz_with_true_false 
+    SET question = %s, answer = %s, your_kahoot_id = %s
+    WHERE id = %s
+    RETURNING id, question, answer, your_kahoot_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (question, answer, your_kahoot_id, id))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Quiz answer/question id not found, no update could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Quiz answer/question id not found, no update could be made. Error message: {e}")
 
+def update_quiz_answer_with_written_answer(con, id, quiz_with_written_answer_id, answer):
+    query = """
+    UPDATE quiz_written_answer
+    SET answer = %s, quiz_with_written_answer_id = %s
+    WHERE id = %s
+    RETURNING id, answer, quiz_with_written_answer_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (answer, quiz_with_written_answer_id, id ))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Quiz answer not found, no update could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the Quiz answer with that id. Error message: {e}")
+
+def update_quiz_question_with_written_answer(con, id, question, your_kahoot_id):
+    query = """
+    UPDATE quiz_with_written_answer
+    SET question = %s, your_kahoot_id = %s
+    WHERE id = %s
+    RETURNING id, question, your_kahoot_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (question, your_kahoot_id, id ))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Quiz question not found, no update could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the Quiz question with that id. Error message: {e}")
+    # FIXME should this have a confirmation message, i.e blba bla deleted?
+    # FIXME borde inte frågan + svaren deletas samtidigt?!
+
+def update_your_kahoot_by(con, your_kahoot_id, title, description, is_private, language_id):
+    query = """
+    UPDATE your_kahoot 
+    SET title = %s, description = %s, is_private = %s, language_id = %s
+    WHERE id = %s
+    RETURNING id, title, description;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (title, description, is_private, language_id, your_kahoot_id))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Kahoot id not found, no update could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the Kahoot with that id. Error message: {e}")
+    
+def update_groups(con, id, name, description):
+    query = """
+    UPDATE groups
+    SET name = %s, description = %s
+    WHERE id = %s
+    RETURNING name, description, id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (name, description, id))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Group not found, no update could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the user. Error message: {e}")
+
+def update_presentation_classic(con, id, your_kahoot_id, title=None, text=None):
+    query = """
+    UPDATE presentation_classic 
+    SET title = %s, text = %s, your_kahoot_id = %s 
+    WHERE id = %s
+    RETURNING *;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (title, text, your_kahoot_id, id))
+                result = cur.fetchone()
+                return result
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the presenation. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to update the presentation. Error message: {e}")
+
+def patch_question_quiz_with_true_false(con, id, question):
+    query = """
+    UPDATE quiz_with_true_false 
+    SET question = %s
+    WHERE id = %s
+    RETURNING id, question, answer, your_kahoot_id;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (question, id))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Quiz answer/question id not found, no update could be made")
+                return result
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Database error while updating quiz. Error message: {e}")
+    
+clear_tables(con)
+test_inputs()
+
+# # Example calls for delete functions
+#=====================================================
 # delete_user_by_username(con, ("jane_smith",))
 # delete_your_kahoot_by_id(con, 1)
 # delete_quiz_with_written_answer(con, 1)
 # delete_quiz_answer_with_written_answer(con, 1)
 # delete_quiz_with_true_false(con, 3)
+#=====================================================
 
+# # Example calls for update functions
+# #=====================================================
+# update_quiz_with_true_false(con, 1, "Did the catholic church believe earth was center of universe in 16th century", True, 1)
+# update_quiz_answer_with_written_answer(con, 1, 1, '6')
+# update_quiz_question_with_written_answer(con, 1, 'What is 3 + 3', 1)
+# update_your_kahoot_by(con, 1, 'The best kahoot', 'Best of the best', True, 1)
+# update_groups(con, 3, 'Teknikhögskolan', 'AI nerds')
+# update_presentation_classic(con, 3, 1, title='Welcome to the Tobias AI-quiz', text='Prepare to be amazed by AI-generated questions!')
+# #=====================================================
 
-
-
+# # Example calls for patch functions
+# #=====================================================
+# patch_question_quiz_with_true_false(con, 1, "Do most people believe the earth is flat?")
+# #=====================================================
 
 
 # TODO REMOVE THIS BEFORE SENDING IN
