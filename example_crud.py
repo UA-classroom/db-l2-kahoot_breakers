@@ -25,6 +25,9 @@
 # patch_question_quiz_with_true_false(con, 1, "Do most people believe the earth is flat?")
 # #=====================================================
 
+from db import *
+
+
 def clear_tables(con):
     with con:
         with con.cursor() as cur:
