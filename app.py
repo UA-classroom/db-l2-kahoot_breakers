@@ -100,8 +100,8 @@ def create_subscription_endpoint(subscription: SubscriptionCreate):
     try:
         out_data = create_subscriptions(connection, subscription.name)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to save the subscription name. Error message: {e}")
     finally:
         connection.close()
 
@@ -111,8 +111,8 @@ def create_language_endpoint(language: LanguageCreate):
     try:
         out_data = create_languages(connection, language.name)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to save the language name. Error message: {e}")
     finally:
         connection.close()
 
@@ -122,8 +122,8 @@ def create_customer_types_endpoint(customer_type: CustomerTypeCreate):
     try:
         out_data = create_customer_types(connection, customer_type.name)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to save the customer type name. Error message: {e}")
     finally:
         connection.close()
 
@@ -143,8 +143,12 @@ def create_users_endpoint(user: UsersCreate):
                                 organisation=user.organisation
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=409, detail=f"Unable to save the user, userdata already exists violating unique constraints. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to save the user, violating foreign key constraints. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to save the user. Error message: {e}")
     finally:
         connection.close()
 
@@ -159,8 +163,10 @@ def create_your_kahoot_endpoint(kahoot: YourKahootCreate):
                                     is_private=kahoot.is_private
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to save the kahoot because of foreign key violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to save the kahoot. Error message: {e}")
     finally:
         connection.close()
 
@@ -173,8 +179,12 @@ def create_kahoot_owners_endpoint(kahoot_owner: KahootOwnerCreate):
                                         your_kahoot_id=kahoot_owner.your_kahoot_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=409, detail=f"Unable to create the kahoot ownership because it already exists. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the kahoot ownership. Foreign key violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the kahoot ownership. Error message: {e}")
     finally:
         connection.close()
 
@@ -187,8 +197,12 @@ def create_favorite_kahoot_endpoint(favorite: FavoriteKahootCreate):
                                         your_kahoot_id=favorite.your_kahoot_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=409, detail=f"Unable to create favorite kahoot because it already exists as favorite. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create favorite kahoot. Foreign key violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
     finally:
         connection.close()
 
@@ -201,8 +215,8 @@ def create_groups_endpoint(group: GroupCreate):
                                 description=group.description
         )
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group. Error message: {e}")
     finally:
         connection.close()
 
@@ -215,8 +229,12 @@ def create_group_membership_endpoint(membership: GroupMembershipCreate):
                                 group_id=membership.group_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.UniqueViolation as e:
+        raise HTTPException(status_code=409, detail=f"Unable to create the group membership because it already exists. Error message: {e}")
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the group membership. Foreign key constraint violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the group membership. Error message: {e}")
     finally:
         connection.close()
 
@@ -229,8 +247,10 @@ def create_written_quiz_endpoint(quiz: WrittenQuizCreate):
                                     your_kahoot_id=quiz.your_kahoot_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the quiz. Foreign key constraint violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
     finally:
         connection.close()
 
@@ -243,8 +263,10 @@ def create_answer_quiz_endpoint(quiz_answer: QuizAnswerCreate):
                                     quiz_with_written_answer_id=quiz_answer.quiz_with_written_answer_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the quiz answer. Foreign key constraint violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz answer. Error message: {e}")
     finally:
         connection.close()
 
@@ -258,8 +280,10 @@ def create_true_false_quiz_endpoint(quiz: TrueFalseQuizCreate):
                                         your_kahoot_id=quiz.your_kahoot_id
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the quiz. Foreign key constraint violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
     finally:
         connection.close()
 
@@ -273,8 +297,10 @@ def create_classic_presenation_endpoint(presentation: PresentationClassicCreate)
                                             text=presentation.text
         )
         return out_data
-    except:
-        pass
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=404, detail=f"Unable to create the presention. Foreign key constraint violation. Error message: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to create the presenation. Error message: {e}")
     finally:
         connection.close()
 
@@ -284,8 +310,8 @@ def read_all_users_endpoint():
     try:
         out_data = read_all_users(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get all user information. Error message: {e}")
     finally:
         connection.close()
 
@@ -295,8 +321,8 @@ def read_all_kahoots_endpoint():
     try:
         out_data = read_all_kahoots(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get information of all kahoots. Error message: {e}")
     finally:
         connection.close()
 
@@ -306,8 +332,8 @@ def read_all_groups_endpoint():
     try:
         out_data = read_all_groups(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get information of all groups. Error message: {e}")
     finally:
         connection.close()
 
@@ -317,8 +343,8 @@ def read_users_kahoot_endpoint():
     try:
         out_data = read_users_joined_kahoot(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their kahoots. Error message: {e}")
     finally:
         connection.close()
 
@@ -328,8 +354,8 @@ def read_users_favorite_kahoot_endpoint():
     try:
         out_data = read_users_favorite_kahoot(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their favorite kahoots. Error message: {e}")
     finally:
         connection.close()
 
@@ -339,8 +365,8 @@ def read_users_groups_endpoint():
     try:
         out_data = read_users_groups(connection)
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their groups. Error message: {e}")
     finally:
         connection.close()
 
@@ -349,9 +375,11 @@ def read_individual_user_endpoint(user_id: int):
     connection = get_connection()
     try:
         out_data = read_individual_user(connection, user_id)
+        if out_data is None:
+                    raise HTTPException(status_code=404, detail="No user found with provided primary key id.")
         return out_data
-    except:
-        pass
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to provide information of the user. Error message: {e}")
     finally:
         connection.close()
 

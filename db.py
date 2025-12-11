@@ -82,9 +82,9 @@ def create_users(con, username, email, password, birthdate, subscriptions_id, la
                 result = cur.fetchone()
                 return result
     except psycopg2.errors.UniqueViolation as e:
-        raise HTTPException(status_code=400, detail=f"Unable to insert the user. Error message: {e}")
+        raise HTTPException(status_code=409, detail=f"Unable to insert the user. Error message: {e}")
     except psycopg2.errors.ForeignKeyViolation as e:
-        raise HTTPException(status_code=400, detail=f"Unable to insert the user. Error message: {e}")
+        raise HTTPException(status_code=404, detail=f"Unable to insert the user. Error message: {e}")
 
 def create_your_kahoot(con, title, language_id, description=None, is_private=False):
     query = """
@@ -133,9 +133,9 @@ def create_favorite_kahoots(con, users_id, your_kahoot_id):
                 result = cur.fetchone()
                 return result
     except psycopg2.errors.UniqueViolation as e:
-        raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
+        raise HTTPException(status_code=409, detail=f"Unable to create favorite kahoot. Error message: {e}")
     except psycopg2.errors.ForeignKeyViolation as e:
-        raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
+        raise HTTPException(status_code=404, detail=f"Unable to create favorite kahoot. Error message: {e}")
 
 def create_groups(con, name, description=None):
     query = """
