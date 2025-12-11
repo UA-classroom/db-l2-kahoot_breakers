@@ -1,11 +1,5 @@
-import os
-from datetime import date
-from typing import Optional
-
 import psycopg2
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
+import schemas as s
 from db import (
     create_answer_quiz,
     create_customer_types,
@@ -41,123 +35,14 @@ from db import (
     update_your_kahoot_by,
 )
 from db_setup import get_connection
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
-
-"""
-ADD ENDPOINTS FOR FASTAPI HERE
-Make sure to do the following:
-- Use the correct HTTP method (e.g get, post, put, delete)
-- Use correct STATUS CODES, e.g 200, 400, 401 etc. when returning a result to the user
-- Use pydantic models whenever you receive user data and need to validate the structure and data types (VG)
-This means you need some error handling that determine what should be returned to the user
-Read more: https://www.geeksforgeeks.org/10-most-common-http-status-codes/
-- Use correct URL paths the resource, e.g some endpoints should be located at the exact same URL, 
-but will have different HTTP-verbs.
-"""
-
-# Pydantic Models for POST endpoints (CREATE)
-class SubscriptionCreate(BaseModel):
-    name: str
-
-class LanguageCreate(BaseModel):
-    name: str
-
-class CustomerTypeCreate(BaseModel):
-    name: str
-
-class UsersCreate(BaseModel):
-    username: str
-    email: str
-    password: str
-    birthdate: date
-    subscriptions_id: int
-    language_id: int
-    customer_type_id: int
-    name: Optional[str] = None
-    organisation: Optional[str] = None
-
-class YourKahootCreate(BaseModel):
-    title: str
-    language_id: int
-    description: Optional[str] = None
-    is_private: bool = False
-
-class KahootOwnerCreate(BaseModel):
-    users_id: int
-    your_kahoot_id: int
-
-class FavoriteKahootCreate(BaseModel):
-    users_id: int
-    your_kahoot_id: int
-
-class GroupCreate(BaseModel):
-    name: str
-    description: str | None = None
-
-class GroupMembershipCreate(BaseModel):
-    user_id: int
-    group_id: int
-
-class WrittenQuizCreate(BaseModel):
-    question: str
-    your_kahoot_id: int
-
-class QuizAnswerCreate(BaseModel):
-    answer: str
-    quiz_with_written_answer_id: int
-
-class TrueFalseQuizCreate(BaseModel):
-    question: str
-    answer: bool
-    your_kahoot_id: int
-
-class PresentationClassicCreate(BaseModel):
-    your_kahoot_id: int
-    title: Optional[str] = None
-    text: Optional[str] = None
-
-# Pydantic Models for PUT endpoints (UPDATE)
-class QuizAnswerWrittenUpdate(BaseModel):
-    answer: str
-    quiz_with_written_answer_id: int
-
-class QuizQuestionWrittenUpdate(BaseModel):
-    question: str
-    your_kahoot_id: int
-
-class YourKahootUpdate(BaseModel):
-    title: str
-    description: str | None = None
-    is_private: bool
-    language_id: int
-
-class GroupUpdate(BaseModel):
-    name: str
-    description: str | None = None
-
-class QuizTrueFalseUpdate(BaseModel):
-    question: str
-    answer: bool
-    your_kahoot_id: int
-
-class PresentationClassicUpdate(BaseModel):
-    your_kahoot_id: int
-    title: str | None = None
-    text: str | None = None
-
-# Pydantic Models for PATCH endpoints (PARTIAL UPDATE)
-class QuizTrueFalseQuestionPatch(BaseModel):
-    question: str
-
-# Pydantic Models for DELETE endpoints
-class Username(BaseModel):
-    username: str
 
 # ==================== POST ENDPOINTS (CREATE) ====================
 
 @app.post("/subscriptions")
-def create_subscription_endpoint(subscription: SubscriptionCreate):
+def create_subscription_endpoint(subscription: s.SubscriptionCreate):
     connection = get_connection()
     try:
         out_data = create_subscriptions(connection, subscription.name)
@@ -168,7 +53,7 @@ def create_subscription_endpoint(subscription: SubscriptionCreate):
         connection.close()
 
 @app.post("/language")
-def create_language_endpoint(language: LanguageCreate):
+def create_language_endpoint(language: s.LanguageCreate):
     connection = get_connection()
     try:
         out_data = create_languages(connection, language.name)
@@ -179,7 +64,7 @@ def create_language_endpoint(language: LanguageCreate):
         connection.close()
 
 @app.post("/customer_type")
-def create_customer_types_endpoint(customer_type: CustomerTypeCreate):
+def create_customer_types_endpoint(customer_type: s.CustomerTypeCreate):
     connection = get_connection()
     try:
         out_data = create_customer_types(connection, customer_type.name)
@@ -190,7 +75,7 @@ def create_customer_types_endpoint(customer_type: CustomerTypeCreate):
         connection.close()
 
 @app.post("/user")
-def create_users_endpoint(user: UsersCreate):
+def create_users_endpoint(user: s.UsersCreate):
     connection = get_connection()
     try:
         out_data = create_users(connection,
@@ -215,7 +100,7 @@ def create_users_endpoint(user: UsersCreate):
         connection.close()
 
 @app.post("/your_kahoot")
-def create_your_kahoot_endpoint(kahoot: YourKahootCreate):
+def create_your_kahoot_endpoint(kahoot: s.YourKahootCreate):
     connection = get_connection()
     try:
         out_data = create_your_kahoot(connection,
@@ -233,7 +118,7 @@ def create_your_kahoot_endpoint(kahoot: YourKahootCreate):
         connection.close()
 
 @app.post("/kahoot_owner")
-def create_kahoot_owners_endpoint(kahoot_owner: KahootOwnerCreate):
+def create_kahoot_owners_endpoint(kahoot_owner: s.KahootOwnerCreate):
     connection = get_connection()
     try:
         out_data = create_kahoot_owners(connection,
@@ -251,7 +136,7 @@ def create_kahoot_owners_endpoint(kahoot_owner: KahootOwnerCreate):
         connection.close()
 
 @app.post("/favorite_kahoot")
-def create_favorite_kahoot_endpoint(favorite: FavoriteKahootCreate):
+def create_favorite_kahoot_endpoint(favorite: s.FavoriteKahootCreate):
     connection = get_connection()
     try:
         out_data = create_favorite_kahoots(connection,
@@ -269,7 +154,7 @@ def create_favorite_kahoot_endpoint(favorite: FavoriteKahootCreate):
         connection.close()
 
 @app.post("/group")
-def create_groups_endpoint(group: GroupCreate):
+def create_groups_endpoint(group: s.GroupCreate):
     connection = get_connection()
     try:
         out_data = create_groups(connection,
@@ -283,7 +168,7 @@ def create_groups_endpoint(group: GroupCreate):
         connection.close()
 
 @app.post("/group_membership")
-def create_group_membership_endpoint(membership: GroupMembershipCreate):
+def create_group_membership_endpoint(membership: s.GroupMembershipCreate):
     connection = get_connection()
     try:
         out_data = create_user_group_members(connection,
@@ -301,7 +186,7 @@ def create_group_membership_endpoint(membership: GroupMembershipCreate):
         connection.close()
 
 @app.post("/written_quiz")
-def create_written_quiz_endpoint(quiz: WrittenQuizCreate):
+def create_written_quiz_endpoint(quiz: s.WrittenQuizCreate):
     connection = get_connection()
     try:
         out_data = create_written_quiz(connection,
@@ -317,7 +202,7 @@ def create_written_quiz_endpoint(quiz: WrittenQuizCreate):
         connection.close()
 
 @app.post("/quiz_answer")
-def create_answer_quiz_endpoint(quiz_answer: QuizAnswerCreate):
+def create_answer_quiz_endpoint(quiz_answer: s.QuizAnswerCreate):
     connection = get_connection()
     try:
         out_data = create_answer_quiz(connection,
@@ -333,7 +218,7 @@ def create_answer_quiz_endpoint(quiz_answer: QuizAnswerCreate):
         connection.close()
 
 @app.post("/true_false_quiz")
-def create_true_false_quiz_endpoint(quiz: TrueFalseQuizCreate):
+def create_true_false_quiz_endpoint(quiz: s.TrueFalseQuizCreate):
     connection = get_connection()
     try:
         out_data = create_true_false_quiz(connection,
@@ -350,7 +235,7 @@ def create_true_false_quiz_endpoint(quiz: TrueFalseQuizCreate):
         connection.close()
 
 @app.post("/classic_presenation")
-def create_classic_presenation_endpoint(presentation: PresentationClassicCreate):
+def create_classic_presenation_endpoint(presentation: s.PresentationClassicCreate):
     connection = get_connection()
     try:
         out_data = create_presentation_classic(connection,
@@ -540,7 +425,7 @@ def delete_quiz_with_true_false_endpoint(quiz_with_true_false_id: int):
 # ==================== PUT ENDPOINTS (UPDATE) ====================
 
 @app.put("/quiz_true_false/{id}")
-def put_quiz_true_false(id: int, quiz: QuizTrueFalseUpdate):
+def put_quiz_true_false(id: int, quiz: s.QuizTrueFalseUpdate):
     con = get_connection()
 
     try:
@@ -557,7 +442,7 @@ def put_quiz_true_false(id: int, quiz: QuizTrueFalseUpdate):
         con.close()
 
 @app.put("/quiz_answer_with_written_answer/{id}")
-def put_quiz_answer_with_written_answer(id: int, body: QuizAnswerWrittenUpdate):
+def put_quiz_answer_with_written_answer(id: int, body: s.QuizAnswerWrittenUpdate):
     con = get_connection()
     try:
         result = update_quiz_answer_with_written_answer(con, id=id, quiz_with_written_answer_id=body.quiz_with_written_answer_id,answer=body.answer,)
@@ -573,7 +458,7 @@ def put_quiz_answer_with_written_answer(id: int, body: QuizAnswerWrittenUpdate):
         con.close()
 
 @app.put("/quiz_question_with_written_answer/{id}")
-def put_quiz_question_with_written_answer(id: int, body: QuizQuestionWrittenUpdate):
+def put_quiz_question_with_written_answer(id: int, body: s.QuizQuestionWrittenUpdate):
     con = get_connection()
     try:
         result = update_quiz_question_with_written_answer(con, id=id, question=body.question, your_kahoot_id=body.your_kahoot_id,)
@@ -589,7 +474,7 @@ def put_quiz_question_with_written_answer(id: int, body: QuizQuestionWrittenUpda
         con.close()
 
 @app.put("/your_kahoot/{your_kahoot_id}")
-def put_your_kahoot(your_kahoot_id: int, body: YourKahootUpdate):
+def put_your_kahoot(your_kahoot_id: int, body: s.YourKahootUpdate):
     con = get_connection()
     try:
         result = update_your_kahoot_by(con, your_kahoot_id=your_kahoot_id, title=body.title, description=body.description, is_private=body.is_private, language_id=body.language_id,)
@@ -605,7 +490,7 @@ def put_your_kahoot(your_kahoot_id: int, body: YourKahootUpdate):
         con.close()
 
 @app.put("/groups/{id}")
-def put_group(id: int, body: GroupUpdate):
+def put_group(id: int, body: s.GroupUpdate):
     con = get_connection()
     try:
         result = update_groups(con, id=id, name=body.name, description=body.description,)
@@ -621,7 +506,7 @@ def put_group(id: int, body: GroupUpdate):
         con.close()
 
 @app.put("/presentation_classic/{id}")
-def put_presentation_classic(id: int, body: PresentationClassicUpdate):
+def put_presentation_classic(id: int, body: s.PresentationClassicUpdate):
     con = get_connection()
     try:
         result = update_presentation_classic(con, id=id,your_kahoot_id=body.your_kahoot_id,title=body.title,text=body.text,)
@@ -639,7 +524,7 @@ def put_presentation_classic(id: int, body: PresentationClassicUpdate):
 # ==================== PATCH ENDPOINTS (PARTIAL UPDATE) ====================
 
 @app.patch("/quiz_true_false/{id}")
-def patch_quiz_true_false_question(id: int, body: QuizTrueFalseQuestionPatch):
+def patch_quiz_true_false_question(id: int, body: s.QuizTrueFalseQuestionPatch):
     con = get_connection()
     try:
         result = patch_question_quiz_with_true_false(con, id=id, question=body.question,)
@@ -653,21 +538,3 @@ def patch_quiz_true_false_question(id: int, body: QuizTrueFalseQuestionPatch):
         raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
     finally:
         con.close()
-
-# INSPIRATION FOR A LIST-ENDPOINT - Not necessary to use pydantic models, but we could to ascertain that we return the correct values
-# @app.get("/items/")
-# def read_items():
-#     con = get_connection()
-#     items = get_items(con)
-#     return {"items": items}
-
-
-# INSPIRATION FOR A POST-ENDPOINT, uses a pydantic model to validate
-# @app.post("/validation_items/")
-# def create_item_validation(item: ItemCreate):
-#     con = get_connection()
-#     item_id = add_item_validation(con, item)
-#     return {"item_id": item_id}
-
-
-# IMPLEMENT THE ACTUAL ENDPOINTS! Feel free to remove
