@@ -55,13 +55,13 @@ def test_complex_creates(test_data):
     kahoot_resp = client.post("/your_kahoot", json=test_data["kahoot"])
     assert kahoot_resp.status_code in [400, 404]  # Expected: missing language_id=1
 
-# DELETE TESTS - Skip due to pool exhaustion, test manually
+# DELETE TESTS  
 def test_delete_smoke():
     """Quick delete check - expect 404 (OK)"""
     resp = client.delete("/users/pytestnonexistent")
     assert resp.status_code == 404
 
-# UPDATE TESTS - Skip due to pool exhaustion, test manually
+# UPDATE TESTS 
 def test_update_smoke():
     """Quick update check - expect reasonable response"""
     resp = client.put("/your_kahoot/1", json={"title": "test", "language_id": 1, "is_private": False, "description": ""})

@@ -1,30 +1,3 @@
-# clear_tables(con)
-# test_inputs()
-
-# # Example calls for delete functions
-#=====================================================
-# delete_user_by_username(con, ("jane_smith",))
-# delete_your_kahoot_by_id(con, 1)
-# delete_quiz_with_written_answer(con, 1)
-# delete_quiz_answer_with_written_answer(con, 1)
-# delete_quiz_with_true_false(con, 3)
-#=====================================================
-
-# # Example calls for update functions
-# #=====================================================
-# update_quiz_with_true_false(con, 1, "Did the catholic church believe earth was center of universe in 16th century", True, 1)
-# update_quiz_answer_with_written_answer(con, 1, 1, '6')
-# update_quiz_question_with_written_answer(con, 1, 'What is 3 + 3', 1)
-# update_your_kahoot_by(con, 1, 'The best kahoot', 'Best of the best', True, 1)
-# update_groups(con, 3, 'Teknikhögskolan', 'AI nerds')
-# update_presentation_classic(con, 3, 1, title='Welcome to the Tobias AI-quiz', text='Prepare to be amazed by AI-generated questions!')
-# #=====================================================
-
-# # Example calls for patch functions
-# #=====================================================
-# patch_question_quiz_with_true_false(con, 1, "Do most people believe the earth is flat?")
-# #=====================================================
-
 from db import *
 
 
@@ -201,3 +174,30 @@ def test_inputs():
 
     for title, text, your_kahoot_id in presentation_classic_tests:
         create_presentation_classic(con, your_kahoot_id, title, text)
+
+# clear_tables(con)
+# test_inputs()
+
+# # Example calls for delete functions
+#=====================================================
+# delete_user_by_username(con, ("jane_smith",))
+# delete_your_kahoot_by_id(con, 1)
+# delete_quiz_with_written_answer(con, 1)
+# delete_quiz_answer_with_written_answer(con, 1)
+# delete_quiz_with_true_false(con, 3)
+#=====================================================
+
+# # Example calls for update functions
+# #=====================================================
+# update_quiz_with_true_false(con, 1, "Did the catholic church believe earth was center of universe in 16th century", True, 1)
+# update_quiz_answer_with_written_answer(con, 1, 1, '6')
+# update_quiz_question_with_written_answer(con, 1, 'What is 3 + 3', 1)
+# update_your_kahoot_by(con, 1, 'The best kahoot', 'Best of the best', True, 1)
+# update_groups(con, 3, 'Teknikhögskolan', 'AI nerds')
+# update_presentation_classic(con, 3, 1, title='Welcome to the Tobias AI-quiz', text='Prepare to be amazed by AI-generated questions!')
+# #=====================================================
+
+# # Example calls for patch functions
+# #=====================================================
+# patch_question_quiz_with_true_false(con, 1, "Do most people believe the earth is flat?")
+# #=====================================================
