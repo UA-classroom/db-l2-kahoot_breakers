@@ -33,6 +33,16 @@ def get_connection():
     return pool.getconn()
 
 
+def release_connection(conn):
+    """
+    Return a database connection to the pool.
+
+    Args:
+        conn: A psycopg2 connection object to return to the pool.
+    """
+    pool.putconn(conn)
+
+
 def create_tables(con):
     """
     This function executes a series of SQL CREATE TABLE statements
