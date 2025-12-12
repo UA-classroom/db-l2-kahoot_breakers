@@ -17,6 +17,7 @@ from db import (
     create_users,
     create_written_quiz,
     create_your_kahoot,
+    delete_group_by_id,
     delete_quiz_answer_with_written_answer,
     delete_quiz_question_with_written_answer,
     delete_quiz_with_true_false,
@@ -27,6 +28,7 @@ from db import (
     read_all_kahoots,
     read_all_users,
     read_individual_user,
+    read_questions_by_kahoot_id,
     read_users_favorite_kahoot,
     read_users_groups,
     read_users_joined_kahoot,
@@ -82,7 +84,7 @@ def create_subscription_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to save the subscription name. Error message: {e}")
 
-@app.post("/language", status_code=201)
+@app.post("/languages", status_code=201)
 def create_language_endpoint(
     language: s.LanguageCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -93,7 +95,7 @@ def create_language_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to save the language name. Error message: {e}")
 
-@app.post("/customer_type", status_code=201)
+@app.post("/customer_types", status_code=201)
 def create_customer_types_endpoint(
     customer_type: s.CustomerTypeCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -104,7 +106,7 @@ def create_customer_types_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to save the customer type name. Error message: {e}")
 
-@app.post("/user", status_code=201)
+@app.post("/users", status_code=201)
 def create_users_endpoint(
     user: s.UsersCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -129,7 +131,7 @@ def create_users_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to save the user. Error message: {e}")
 
-@app.post("/your_kahoot", status_code=201)
+@app.post("/your_kahoots", status_code=201)
 def create_your_kahoot_endpoint(
     kahoot: s.YourKahootCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -147,7 +149,7 @@ def create_your_kahoot_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to save the kahoot. Error message: {e}")
 
-@app.post("/kahoot_owner", status_code=201)
+@app.post("/kahoot_owners", status_code=201)
 def create_kahoot_owners_endpoint(
     kahoot_owner: s.KahootOwnerCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -165,7 +167,7 @@ def create_kahoot_owners_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the kahoot ownership. Error message: {e}")
 
-@app.post("/favorite_kahoot", status_code=201)
+@app.post("/favorite_kahoots", status_code=201)
 def create_favorite_kahoot_endpoint(
     favorite: s.FavoriteKahootCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -183,7 +185,7 @@ def create_favorite_kahoot_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create favorite kahoot. Error message: {e}")
 
-@app.post("/group", status_code=201)
+@app.post("/groups", status_code=201)
 def create_groups_endpoint(
     group: s.GroupCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -197,7 +199,7 @@ def create_groups_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the group. Error message: {e}")
 
-@app.post("/group_membership", status_code=201)
+@app.post("/group_memberships", status_code=201)
 def create_group_membership_endpoint(
     membership: s.GroupMembershipCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -215,7 +217,7 @@ def create_group_membership_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the group membership. Error message: {e}")
 
-@app.post("/written_quiz", status_code=201)
+@app.post("/quizzes/written_question", status_code=201)
 def create_written_quiz_endpoint(
     quiz: s.WrittenQuizCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -231,7 +233,7 @@ def create_written_quiz_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
 
-@app.post("/quiz_answer", status_code=201)
+@app.post("/quizzes/written_answers", status_code=201)
 def create_answer_quiz_endpoint(
     quiz_answer: s.QuizAnswerCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -247,7 +249,7 @@ def create_answer_quiz_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the quiz answer. Error message: {e}")
 
-@app.post("/true_false_quiz", status_code=201)
+@app.post("/quizzes/true_false", status_code=201)
 def create_true_false_quiz_endpoint(
     quiz: s.TrueFalseQuizCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -264,7 +266,7 @@ def create_true_false_quiz_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
 
-@app.post("/classic_presentation", status_code=201)
+@app.post("/classic_presentations", status_code=201)
 def create_classic_presentation_endpoint(
     presentation: s.PresentationClassicCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -283,7 +285,7 @@ def create_classic_presentation_endpoint(
 
 # ==================== GET ENDPOINTS (READ) ====================
 
-@app.get("/all_users")
+@app.get("/users")
 def read_all_users_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -293,7 +295,7 @@ def read_all_users_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get all user information. Error message: {e}")
 
-@app.get("/all_kahoots")
+@app.get("/your_kahoots")
 def read_all_kahoots_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -303,7 +305,7 @@ def read_all_kahoots_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get information of all kahoots. Error message: {e}")
 
-@app.get("/all_groups")
+@app.get("/groups")
 def read_all_groups_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -313,7 +315,7 @@ def read_all_groups_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get information of all groups. Error message: {e}")
 
-@app.get("/users_kahoot")
+@app.get("/users_kahoots")
 def read_users_kahoot_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -323,7 +325,7 @@ def read_users_kahoot_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their kahoots. Error message: {e}")
 
-@app.get("/users_favorite")
+@app.get("/users_favorites")
 def read_users_favorite_kahoot_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -333,7 +335,7 @@ def read_users_favorite_kahoot_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their favorite kahoots. Error message: {e}")
 
-@app.get("/users_group")
+@app.get("/users_groups")
 def read_users_groups_endpoint(
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
@@ -343,7 +345,7 @@ def read_users_groups_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to get information of all users and their groups. Error message: {e}")
 
-@app.get("/user/{user_id}")
+@app.get("/users/{user_id}")
 def read_individual_user_endpoint(
     user_id: int,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -356,9 +358,19 @@ def read_individual_user_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to provide information of the user. Error message: {e}")
 
-# ==================== DELETE ENDPOINTS ====================
+@app.get("/your_kahoots/{kahoot_id}/questions")
+def read_kahoot_questions_endpoint(
+    kahoot_id: int,
+    connection: psycopg2.extensions.connection = Depends(get_db_connection)
+):
+    try:
+        # This calls the function we just added to db.py
+        out_data = read_questions_by_kahoot_id(connection, kahoot_id)
+        return out_data
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Unable to get questions. Error message: {e}")
 
-### Delete endpoint - easy!
+# ==================== DELETE ENDPOINTS ====================
 
 # We generally return a 204 or 200 when deleting. 
 # If we return a 204, fastapi automatically removes any content, so there’s no point in returning a dictionary with content in it. 
@@ -379,11 +391,12 @@ def delete_user_endpoint(
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
+# FIXME ABOVE PYDANTIC SHOULD BE USED OR?
 
 # If DELETE endpoints that only take an {id} "int" in the URL, 
 # The we should be able to skip Pydantic models and keep just the typed path parameter
 
-@app.delete("/your_kahoot/{your_kahoot_id}")
+@app.delete("/your_kahoots/{your_kahoot_id}")
 def delete_your_kahoot_endpoint(
     your_kahoot_id: int,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -399,7 +412,7 @@ def delete_your_kahoot_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
 
-@app.delete("/quiz_question_with_written_answer/{quiz_with_written_answer_id}")
+@app.delete("/quizzes/written_question/{id}")
 def delete_quiz_question_with_written_answer_endpoint(
     quiz_with_written_answer_id: int,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -415,7 +428,7 @@ def delete_quiz_question_with_written_answer_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
 
-@app.delete("/quiz_answer_with_written_answer/{quiz_written_answer_id}")
+@app.delete("/quizzes/written_answer/{id}")
 def delete_quiz_answer_with_written_answer_endpoint(
     quiz_written_answer_id: int,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -431,7 +444,7 @@ def delete_quiz_answer_with_written_answer_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
 
-@app.delete("/quiz_true_false/{quiz_with_true_false_id}")
+@app.delete("/quizzes/true_false/{id}")
 def delete_quiz_with_true_false_endpoint(
     quiz_with_true_false_id: int,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
@@ -447,9 +460,25 @@ def delete_quiz_with_true_false_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
 
+@app.delete("/groups/{id}")
+def delete_group_endpoint(
+    id: int,
+    connection: psycopg2.extensions.connection = Depends(get_db_connection)
+):
+    try:
+        result = delete_group_by_id(connection, id)
+        return {
+            "message": f"Group id '{id}' deleted successfully",
+            "deleted_group": result,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
+
 # ==================== PUT ENDPOINTS (UPDATE) ====================
 
-@app.put("/quiz_true_false/{id}")
+@app.put("/quizzes/true_false/{id}")
 def put_quiz_true_false(
     id: int,
     quiz: s.QuizTrueFalseUpdate,
@@ -466,7 +495,7 @@ def put_quiz_true_false(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
 
-@app.put("/quiz_answer_with_written_answer/{id}")
+@app.put("/quizzes/written_answer/{id}")
 def put_quiz_answer_with_written_answer(
     id: int,
     body: s.QuizAnswerWrittenUpdate,
@@ -483,7 +512,7 @@ def put_quiz_answer_with_written_answer(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
 
-@app.put("/quiz_question_with_written_answer/{id}")
+@app.put("/quizzes/written_question/{id}")
 def put_quiz_question_with_written_answer(
     id: int,
     body: s.QuizQuestionWrittenUpdate,
@@ -500,7 +529,7 @@ def put_quiz_question_with_written_answer(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
 
-@app.put("/your_kahoot/{your_kahoot_id}")
+@app.put("/your_kahoots/{your_kahoot_id}")
 def put_your_kahoot(
     your_kahoot_id: int,
     body: s.YourKahootUpdate,
@@ -534,7 +563,7 @@ def put_group(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Update failed: {str(e)}")
 
-@app.put("/classic_presentation/{id}")
+@app.put("/classic_presentations/{id}")
 def put_presentation_classic(
     id: int,
     body: s.PresentationClassicUpdate,
@@ -553,7 +582,7 @@ def put_presentation_classic(
 
 # ==================== PATCH ENDPOINTS (PARTIAL UPDATE) ====================
 
-@app.patch("/quiz_true_false/{id}")
+@app.patch("/quizzes/true_false/{id}")
 def patch_quiz_true_false_question(
     id: int,
     body: s.QuizTrueFalseQuestionPatch,

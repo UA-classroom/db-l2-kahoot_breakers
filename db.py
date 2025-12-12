@@ -354,6 +354,63 @@ def read_individual_user(con, primary_key_id):
     except DatabaseError as e:
         raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
+def read_questions_by_kahoot_id(con, kahoot_id):
+    """
+    Fetches True/False, Written Questions, and Slides for a specific Kahoot
+    and combines them into a single list.
+    """
+    questions = []
+    
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                
+                # 1. Get True/False Questions
+                cur.execute("""
+                    SELECT id, question, 'True/False' as type, answer 
+                    FROM quiz_with_true_false 
+                    WHERE your_kahoot_id = %s
+                """, (kahoot_id,))
+                questions.extend(cur.fetchall())
+
+                # 2. Get Written Questions (Stems)
+                cur.execute("""
+                    SELECT id, question, 'Written' as type 
+                    FROM quiz_with_written_answer 
+                    WHERE your_kahoot_id = %s
+                """, (kahoot_id,))
+                questions.extend(cur.fetchall())
+
+                # 3. Get Slides (Presentation)
+                cur.execute("""
+                    SELECT id, title as question, 'Slide' as type, text 
+                    FROM presentation_classic 
+                    WHERE your_kahoot_id = %s
+                """, (kahoot_id,))
+                questions.extend(cur.fetchall())
+                
+                return questions
+
+    except DatabaseError as e:
+        raise HTTPException(status_code=400, detail=f"Error fetching questions: {e}")
+
+def delete_group_by_id(con, group_id):
+    query = """
+    DELETE FROM groups 
+    WHERE id = %s
+    RETURNING id, name;
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (group_id, ))
+                result = cur.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Group not found, no deletion could be made")
+                return result
+    except psycopg2.errors.ForeignKeyViolation as e:
+        raise HTTPException(status_code=400, detail=f"Unable to delete the group. Error message: {e}")
+
 def delete_user_by_username(con, username):
     query = """
     DELETE FROM users 
