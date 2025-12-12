@@ -1,5 +1,6 @@
 import psycopg2
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 import schemas as s
 from db import (
@@ -40,6 +41,20 @@ from db_setup import get_connection, release_connection
 
 app = FastAPI()
 
+# Configure CORS to allow requests from your frontend's address
+origins = [
+    "http://localhost:5173", # Common Vite default port
+    "http://127.0.0.1:5173",
+    # Add any other origins your frontend might run on
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency function to manage database connection lifecycle
 def get_db_connection():
