@@ -249,7 +249,7 @@ def create_true_false_quiz_endpoint(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Unable to create the quiz. Error message: {e}")
 
-@app.post("/classic_presentation")
+@app.post("/classic_presenttation")
 def create_classic_presentation_endpoint(
     presentation: s.PresentationClassicCreate,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)

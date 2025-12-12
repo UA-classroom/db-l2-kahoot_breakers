@@ -3,11 +3,6 @@ from fastapi import HTTPException
 from psycopg2 import DatabaseError
 from psycopg2.extras import RealDictCursor
 
-# FIXME ska nedan tas bort också?
-from db_setup import (
-    get_connection,
-)
-
 
 def create_subscriptions(con, name):
     query = """
@@ -264,12 +259,6 @@ def read_all_groups(con):
         raise HTTPException(status_code=400, detail=f"Unable to read the groups. Error message: {e}")
 
 def read_users_joined_kahoot(con):
-    # This query is complicated but necessary.
-    # I have my users table that is on the left side, and want to join it to the your_kahoot table,
-    # to see all the kahoots a user have. The problem is in your_kahoot table there is no foreign key stored
-    # for the users, beacuse there is an intermediate table that store the relationship.
-    # Therefore to reach your_kahoot we need to left join 3 tables.
-    # And lastly user.id and your_kahoot.id is renamed with alias because both tables use id as a primary key name.
     query = """
     SELECT 
         users.id AS user_id,
@@ -296,11 +285,6 @@ def read_users_joined_kahoot(con):
         raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
 def read_users_favorite_kahoot(con):
-    # We have users table that is on the left side, and want to join it to favorite_kahoot,
-    # to see all the favorite kahoots a user have. The problem is that favorite_kahoot only stores the relationship
-    # and not other data, therefore we still need to tripple join it with your_kahoot where data is stored.
-    # We use alias for id because both table have the same name for id.
-    # We use order by because otherwise the order will be different every time the function is called.
     query = """
     SELECT 
         users.id AS user_id,
@@ -329,9 +313,6 @@ def read_users_favorite_kahoot(con):
         raise HTTPException(status_code=400, detail=f"Unable to read the users data. Error message: {e}")
 
 def read_users_groups(con):
-    # We have our users table that is on the left side, and want to join it to the groups table,
-    # to see which group a user belongs to. The problem is in the groups table there is no foreign key stored,
-    # thats why we need to tripple join it with the intermediate table where the relationship is stored.
     query = """
     SELECT 
         users.id AS user_id,
@@ -367,7 +348,6 @@ def read_individual_user(con, primary_key_id):
             with con.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(query, (primary_key_id,))
                 result = cur.fetchone()
-                # error handling if no user is found with provided primary key
                 if result is None:
                     raise HTTPException(status_code=400, detail="No user found with provided primary key id.")
                 return result
