@@ -358,6 +358,12 @@ def read_individual_user_endpoint(
 
 # ==================== DELETE ENDPOINTS ====================
 
+### Delete endpoint - easy!
+
+# We generally return a 204 or 200 when deleting. 
+# If we return a 204, fastapi automatically removes any content, so there’s no point in returning a dictionary with content in it. 
+# If we return a 200, we can just use “return” and nothing more.
+
 @app.delete("/users/{username}")
 def delete_user_endpoint(
     username: str,

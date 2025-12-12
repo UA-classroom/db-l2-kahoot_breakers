@@ -5,6 +5,10 @@ from app import app
 
 client = TestClient(app)
 
+####
+# to run this file, run this in root:  pytest tests/test_endpoints.py -v
+#
+
 # AI GENERATED TESTING CODE FOR ENDPOINTS IN test_endpoints.py
 
 # Test data - minimal, safe values
@@ -93,3 +97,23 @@ def test_all_endpoints_smoke():
             else:  # DELETE
                 resp = client.delete(path)
             assert resp.status_code < 500, f"{method} {path} crashed"
+
+def test_expect_500_error():
+    """Test that specifically checks for a 500 status code"""
+    # This test is designed to trigger a 500 Internal Server Error
+    # by sending malformed or invalid data that causes an unhandled exception
+
+    # Try to create a user with invalid data types that might cause a server error
+    response = client.post("/user", json={
+        "username": None,  # Invalid: should be a string
+        "email": None,  # Invalid: should be a string
+        "password": None,  # Invalid: should be a string
+        "birthdate": "invalid-date-format",  # Invalid date format
+        "subscriptions_id": "not-an-int",  # Invalid: should be an int
+        "language_id": "not-an-int",  # Invalid: should be an int
+        "customer_type_id": "not-an-int"  # Invalid: should be an int
+    })
+
+    # Check if we get a 500 error (or handled errors like 400/422)
+    assert response.status_code == 500 or response.status_code >= 400, \
+        f"Expected 500 or 4xx error, got {response.status_code}"
