@@ -43,6 +43,7 @@ from db_setup import get_connection, release_connection
 
 app = FastAPI()
 
+############## FRONTEND AI GENERATED ##############
 # Configure CORS to allow requests from your frontend's address
 origins = [
     "http://localhost:5173", # Common Vite default port
@@ -57,6 +58,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+############## / FRONTEND AI GENERATED ##############
 
 # Dependency function to manage database connection lifecycle
 def get_db_connection():
