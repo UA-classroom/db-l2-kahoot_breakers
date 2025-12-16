@@ -380,23 +380,19 @@ def read_kahoot_questions_endpoint(
 
 @app.delete("/users/{username}")
 def delete_user_endpoint(
-    username: str,
+    user: s.Username,
     connection: psycopg2.extensions.connection = Depends(get_db_connection)
 ):
     try:
-        result = delete_user_by_username(connection, username)
+        result = delete_user_by_username(connection, user.username)
         return {
-            "message": f"User '{username}' deleted successfully",
+            "message": f"User '{user.username}' deleted successfully",
             "deleted_user": result,
         }
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Delete failed: {str(e)}")
-# FIXME ABOVE PYDANTIC SHOULD BE USED OR?
-
-# If DELETE endpoints that only take an {id} "int" in the URL, 
-# The we should be able to skip Pydantic models and keep just the typed path parameter
 
 @app.delete("/your_kahoots/{your_kahoot_id}")
 def delete_your_kahoot_endpoint(
