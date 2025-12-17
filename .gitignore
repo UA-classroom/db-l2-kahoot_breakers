@@ -1,5 +1,10 @@
 venv
 .venv
 .env
-.*env*
+*.env
 description*
+__pycache__/
+*.pyc
+.vscode/
+.pytest_cache/
+.claude/

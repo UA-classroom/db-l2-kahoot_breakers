@@ -17,3 +17,8 @@ Ultimately, you can play around with a folder structure if you want to, but we'r
 5. Start the api using uvicorn app:app --reload
 6. Create some basic endpoints, maybe a basic get which fetches all entries for a table. Test it using postman or the built in swagger interface at localhost:8000/docs
 7. Create some basic database-functions that return results from a cursor, your endpoints should utilize these functions
+
+
+## Run very simple basic frontend
+1. go to folder frontend, then npm run dev
+2. start backend in root: uvicorn app:app --reload -port 8000
